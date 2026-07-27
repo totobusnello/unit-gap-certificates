@@ -128,10 +128,14 @@ falsify the record that `certificates/verify_lowk.log`'s hashes depend on.
 
 ## Relation to the working repository
 
-This repository is the frozen artefact set. The working repository of the research programme,
-including the verbatim transcripts of every adversarial review, is
-[`totobusnello/7_problems`](https://github.com/totobusnello/7_problems). That repository
-continues to change; this one does not.
+This repository is the frozen artefact set, and it is the one to cite. The programme's working
+repository — the lab notebook, which also holds correspondence with the author of the refuted
+paper — is private, because that correspondence is not ours to publish. Everything the note
+relies on is here.
+
+If something you need to check is missing, say so and it will be added: the point of an
+artefact set is that a reader can get to the bottom of it without asking, and any gap in that
+is a defect.
 
 ## Citation
 
