@@ -48,16 +48,17 @@ variables ($\oplus_3$) is a counterexample: $\opt(\oplus_3) = 6$ --- UNSAT for e
 $k = 1,\dots,5$, each certified by a DRAT proof checked with \texttt{drat-trim} --- while
 $\tree(\oplus_3) = 9$, giving gap~3; in the optimal six-gate circuit the two output-child sub-DAGs
 intersect in a three-gate parity-2 block, so Krinkin's own term $s = |D_a \cap D_b| = 3$.
-\textbf{Both sides of that gap are classical.} The AIG basis with free inversions is $U_2$, where
-Schnorr's theorem gives the circuit complexity of $\oplus_n$ as exactly $3n-3$, and Lee's rank
-technique gives the De~Morgan formula size of $\oplus_n$ as exactly $2^{\ell}(2^{\ell}+3r)$ leaves
-for $n = 2^{\ell}+r$ --- 6 and 9 gates respectively at $n = 3$ (a formula with $L$ leaves has
-$L-1$ gates). \textbf{So $\gapop(\oplus_3) = 3$
-follows from two published results and the basis identification above, with no computation of
-ours in the chain}; the certificates,
-the dynamic programs and the Lean development replicate that value mechanically rather than
-establish it. (A weaker route needs even less: Khrapchenko forces $\tree(\oplus_3) \ge 8$, which
-with the six-gate circuit already gives $\gapop \ge 2 > 1$.) The error is locatable in the
+\textbf{The refutation itself is classical.} The AIG basis with free inversions is $U_2$, where
+Schnorr's theorem gives the circuit complexity of $\oplus_n$ as exactly $3n-3$, so
+$\opt(\oplus_3) = 6$; Khrapchenko forces $\tree(\oplus_3) \ge 9$ leaves, hence $\ge 8$ gates (a
+formula with $L$ leaves has $L-1$ gates). \textbf{So $\gapop(\oplus_3) \ge 2 > 1$ follows from
+two published results and the basis identification above, with no computation of ours in the
+chain: Theorem~2 was already contradicted by the literature.} The exact value 3 needs
+$\tree(\oplus_3) = 9$, which is not in the refereed literature; it is certified here by the DRAT
+chain, two independent dynamic programs and the Lean development, and agrees with an exhaustive
+enumeration published informally in 2011. At $n = 4$ the exact gap is classical again: Tarui
+determined the De~Morgan formula size of $\oplus_n$ for $n = 2^k$ to be exactly $n^2$ leaves,
+giving $\gapop(\oplus_4) = 15 - 9 = 6$ --- the maximum of the census below. The error is locatable in the
 paper: \S2 displays $\tree(f) = \min(1 + \opt(a) + \opt(b))$ (the DAG measure $\opt$ in the
 children), while \S3's Bellman operator is $(Tv)(f) = \min(1 + v(a) + v(b))$ (the recursive
 measure); these are incompatible characterizations of formula size, the first making Theorem~2 a
@@ -88,9 +89,10 @@ It is not true. This paper does three things.
 
 \begin{enumerate}
   \item \textbf{We refute Theorem~2 and Corollary~6} at $n = 3$ (parity), where the gap is 3 and
-  Krinkin's shared-gate term is 3. \emph{The counterexample is not new mathematics}: both sides of
-  the gap were determined decades ago --- Schnorr for the circuit, Lee for the formula --- so the
-  contradiction with Theorem~2 was already implied by the published literature. What we add is to
+  Krinkin's shared-gate term is 3. \emph{The counterexample is not new mathematics}: the
+  contradiction with Theorem~2 was already implied by the published literature, since Schnorr
+  fixes the circuit side and Khrapchenko bounds the formula side, and the two together give
+  $\gapop(\oplus_3) \ge 2 > 1$. What we add is to
   notice it, to certify it mechanically (a DRAT chain at every $k = 1,\dots,5$ checked by an
   independent tool, two dynamic programs, and a Lean~4 formalization), and above all \textbf{to
   locate the error inside the paper}: \S2 and \S3 give incompatible characterizations of
@@ -236,16 +238,29 @@ under the \S3 reading, Theorem~2 is false.
   to edge inversions, so pushing inversions to the leaves turns an AIG formula into a De~Morgan
   formula with the same number of binary gates and back. Hence
   $\tree = \tree_{U_2} = \tree_{\mathrm{De\,Morgan}}$, and a binary formula with $L$ leaves has
-  $L - 1$ gates --- the same conversion already used for Khrapchenko above. Lee~\cite{lee2007} then
-  determines the De~Morgan formula size of parity for every $n$: writing $n = 2^{\ell} + r$ with
-  $0 \le r < 2^{\ell}$, the minimum number of leaves is exactly $2^{\ell}(2^{\ell} + 3r)$. For
-  $n = 3$ this is 10 leaves, hence 9 two-input gates --- the value the dynamic program and the Lean
-  development compute independently. So Theorem~2 is contradicted by Schnorr and Lee alone. Lee's expression also
-  explains why the Khrapchenko route stops at $\ge 2$: equality with $n^2$ holds exactly when
-  $r = 0$, and Lee notes that no bound above $n^2$ is reachable by Khrapchenko's method at all.
-  The same two results predict $\gapop(\oplus_4) = 15 - 9 = 6$, which is the maximum gap found in
-  the $n = 4$ census of \S\ref{sec:census} --- an external check on the census, not merely on the
-  counterexample.
+  $L - 1$ gates --- the same conversion already used for Khrapchenko above. So Khrapchenko gives
+  $\tree(\oplus_3) \ge 9$ leaves, i.e. $\ge 8$ gates, and with $\opt(\oplus_3) = 6$ this already
+  contradicts Theorem~2: $\gapop(\oplus_3) \ge 2 > 1$, from two published results and the
+  identification above.
+
+  The \emph{exact} value is a different matter. For $n = 2^k$ Tarui~\cite{tarui2010} showed that
+  Khrapchenko's $n^2$ is attained, so the formula size is exactly $n^2$ leaves; this fixes
+  $\tree(\oplus_4) = 16$ leaves, i.e. 15 gates, and hence $\gapop(\oplus_4) = 6$, the maximum gap
+  found in the $n = 4$ census of \S\ref{sec:census} --- an external check on the census, not
+  merely on the counterexample. For $n = 3$ we found no determination in the refereed
+  literature.\footnote{The obvious candidate does not survive. Lee's rank
+  technique~\cite{lee2007} was announced as determining the formula size of parity for every $n$,
+  as $2^{\ell}(2^{\ell}+3r)$ leaves for $n = 2^{\ell}+r$, which would give 10 leaves at $n = 3$.
+  Lee has since retracted that claim: the error is in his Proposition~2, which assumes an optimal
+  selection function takes each $s_i$ to be a power of two, and he points to
+  Rychkov~\cite{rychkov1994} for the current best lower bounds --- $n^2+3$ for odd $n \ge 5$ and
+  $n^2+2$ for even $n \ge 6$ that are not powers of two, neither of which covers $n = 3$. The
+  rank technique itself, and Lee's observation that no bound above $n^2$ is reachable by
+  Khrapchenko's method, are unaffected.} Accordingly $\tree(\oplus_3) = 9$ is certified here
+  rather than cited: by the tree dynamic program, independently re-implemented, and by the Lean
+  development. The value is not new --- an exhaustive enumeration by Cox and Healy~\cite{cox2011}
+  gives 9 AND/OR operators for $\oplus_3$ and 15 for $\oplus_4$, and writes out the optimal
+  $n = 3$ formula --- and the agreement is an external check on both.
 \end{itemize}
 
 Hence $\gapop(\oplus_3) = 3$, refuting Theorem~2.
@@ -427,8 +442,14 @@ Analytic (Khrapchenko + six-gate circuit), independent of the tree DP and the DR
 fully citational via Schnorr + Khrapchenko \\
 \addlinespace
 $\gapop(\oplus_3) = 3$ (exact) &
-Fully citational: Schnorr~\cite{schnorr1976} for $\opt = 6$ and Lee~\cite{lee2007} for
-$\tree = 9$; the only step supplied here is the basis identification of \S\ref{sec:prelim} \\
+Certified here, not cited: the DRAT chain for $\opt = 6$, and two independent dynamic programs
+plus the Lean development for $\tree = 9$. No determination of $\tree(\oplus_3)$ appears in the
+refereed literature (\S\ref{sec:refutation}); the value agrees with the exhaustive enumeration
+of~\cite{cox2011} \\
+\addlinespace
+$\gapop(\oplus_4) = 6$ (exact, census maximum) &
+Fully citational: Schnorr~\cite{schnorr1976} for $\opt = 9$ and Tarui~\cite{tarui2010} for
+$\tree = 15$, since $4 = 2^2$ is where Khrapchenko's bound is attained \\
 \addlinespace
 $\opt(\oplus_3) = 6$, $\opt(\oplus_4) = 9$ (external agreement) &
 Classical: the AIG basis is $U_2$ and Schnorr's theorem gives the $U_2$ complexity of $\oplus_n$ as
@@ -477,13 +498,18 @@ provenance, not part of the verification chain.
   $B_2$, tabulated for small $n$ by Knuth (TAOCP 7.1.2)~\cite{knuth-taocp4a}; our maximum of 7
   agrees. We claim \textbf{no novelty for the XAG numbers themselves}.
 
-  \item \textbf{Both sizes of parity are classical.} Schnorr~\cite{schnorr1976} determined the
-  $U_2$ circuit complexity of $\oplus_n$ exactly, $3n-3$, and Lee~\cite{lee2007} determined its
-  De~Morgan formula size exactly. Since the AIG basis with free inversions is
-  $U_2$ (\S\ref{sec:prelim}), the two together fix $\opt(\oplus_3) = 6$ and $\tree(\oplus_3) = 9$
-  --- hence the gap 3 --- without any computation, and they agree with the values reported here at
-  $n = 4$ as well ($\opt = 9$, $\tree = 15$, gap 6, the census maximum). We claim \textbf{no novelty
-  for either size}; they are used as an external check and to make the refutation citational. What
+  \item \textbf{Both sizes of parity are known, and neither is ours.} Schnorr~\cite{schnorr1976}
+  determined the $U_2$ circuit complexity of $\oplus_n$ exactly, $3n-3$. On the formula side
+  Khrapchenko's $n^2$ lower bound is classical and, for $n = 2^k$, attained~\cite{tarui2010}.
+  Since the AIG basis with free inversions is $U_2$ (\S\ref{sec:prelim}), that fixes
+  $\opt(\oplus_3) = 6$ and $\tree(\oplus_3) \ge 8$ --- already enough to refute Theorem~2 --- and
+  fixes the $n = 4$ values exactly ($\opt = 9$, $\tree = 15$, gap 6, the census maximum). For
+  $\tree(\oplus_3) = 9$ we found no determination in the refereed literature, but the value is not
+  new either: the exhaustive enumeration of Cox and Healy~\cite{cox2011} reports parity as a
+  hardest function at both $n = 3$ and $n = 4$, needing 9 and 15 AND/OR operators, and exhibits
+  the optimal $n = 3$ formula. Both agree with the values computed here. We claim \textbf{no
+  novelty for any of these sizes}; they are used as an external check and to make the refutation
+  citational. What
   we did not find in the literature is the two placed side by side: the circuit bound and the
   formula bound sit in different corners --- gate-elimination and rank methods respectively --- and
   reading them together requires only the basis identification above, which is why the

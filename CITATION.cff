@@ -7,8 +7,10 @@ abstract: >-
   Krinkin, "The Unit Gap: How Sharing Works in Boolean Circuits"
   (arXiv:2603.08033). The counterexample is parity on three inputs, where the
   DAG optimum is 6 gates and the formula optimum is 9, so the gap is 3 rather
-  than the claimed maximum of 1. Both endpoints are classical: Schnorr (1976)
-  for U2 circuit size and Lee (STACS 2007) for De Morgan formula size.
+  than the claimed maximum of 1. The refutation itself is classical: Schnorr
+  (1976) gives the circuit side and Khrapchenko's bound the formula side, which
+  together already force a gap of at least 2. The exact value 3 is certified
+  here.
 authors:
   - family-names: Busnello
     given-names: Luiz Antonio

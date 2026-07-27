@@ -33,19 +33,30 @@ Two independent routes reach the same place, which is the point:
 1. **Certificate route.** Exact synthesis via SAT, with a DRAT proof for each UNSAT step,
    checked by `drat-trim`.
 2. **Classical route, no solver at all.** The AIG basis with free inversions is exactly `U₂` —
-   the full binary basis minus XOR and XNOR — so Schnorr (1976) gives `opt(⊕ₙ) = 3n − 3`, and
-   Lee (STACS 2007) gives the exact De Morgan formula size, 10 leaves and hence 9 gates at
-   `n = 3`. **The refutation closes from two published results and that one identification,
-   with no computation of ours in the chain.** The identification is elementary, but it is a
-   step, and it is supplied here rather than by Schnorr or Lee.
+   the full binary basis minus XOR and XNOR — so Schnorr (1976) gives `opt(⊕₃) = 6`, and
+   Khrapchenko's classical bound forces `tree(⊕₃) ≥ 9` leaves, hence `≥ 8` gates. **So
+   `gap ≥ 2 > 1` closes from two published results and that one identification, with no
+   computation of ours in the chain** — Theorem 2 was already contradicted by the literature.
+   The identification is elementary, but it is a step, and it is supplied here rather than by
+   Schnorr or Khrapchenko.
+
+   The **exact** value 3 is a different matter: it needs `tree(⊕₃) = 9`, which is not in the
+   refereed literature. It is certified here, and it agrees with the exhaustive enumeration
+   published by [Russ Cox and Alex Healy](https://research.swtch.com/boolean) in 2011, which
+   gives parity 9 AND/OR operators at `n = 3` and 15 at `n = 4`.
+
+   The obvious citation for the exact value does not survive: Lee's rank technique (STACS 2007)
+   was announced as determining the formula size of parity for every `n`, and Lee has since
+   [publicly retracted](http://www.cs.columbia.edu/~tl2383/correction.html) that claim.
 
 The certificates in this repository replicate that value mechanically. They no longer carry it.
 
 The failure is structural, not a lucky single function. An exhaustive census over the 222 NPN
 classes of `n = 4` finds **72 classes (32.4%) with gap ≥ 2**, the maximum gap being 6, attained
-by three distinct classes — and that maximum is exactly what Schnorr and Lee predict for
-parity-4. That is an external spot check: it confirms one row of the census against published
-values, not the other 221, and not the NPN-class join.
+by three distinct classes — and that maximum is exactly what Schnorr and Tarui (2010) give for
+parity-4, since `4 = 2²` is where Khrapchenko's bound is attained. That is an external spot
+check: it confirms one row of the census against published values, not the other 221, and not
+the NPN-class join.
 
 The error is locatable in the source paper: §2 displays `tree(f) = min(1 + opt(a) + opt(b))`,
 with the DAG measure `opt` in the children, while §3's Bellman operator is
