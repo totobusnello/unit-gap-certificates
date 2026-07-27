@@ -152,8 +152,17 @@ is a defect.
 
 ## Citation
 
-See `CITATION.cff`. Archived on Zenodo with a permanent DOI; cite the DOI rather than a
-repository URL.
+Archived on Zenodo. Cite the DOI rather than a repository URL — a URL is a moving target, and
+this one has already moved once.
+
+**[10.5281/zenodo.21630762](https://doi.org/10.5281/zenodo.21630762)** — the concept DOI, which
+always resolves to the latest version.
+
+Each release also carries its own version DOI, naming the exact bytes. That one is minted when
+the release is cut, so it cannot appear in the files it archives; the Zenodo page above lists
+every version and its DOI. Cite the version DOI when you want the precise snapshot a claim was
+checked against, the concept DOI when you mean the artefact set in general. Machine-readable
+metadata is in `CITATION.cff`.
 
 ## License
 

@@ -638,9 +638,13 @@ encoding); parity-5 then correctly returns gap 0. All results in \S\ref{sec:base
 \label{app:repro}
 
 \begin{sloppypar}
-Every artifact named below is public at
+Every artifact named below is archived on Zenodo under
+\href{https://doi.org/10.5281/zenodo.21630762}{DOI 10.5281/zenodo.21630762}, and is public at
 \url{https://github.com/totobusnello/unit-gap-artefacts}; the repository root carries a
-table mapping this paper's principal claims to the files that back them. Re-checking that the archived
+table mapping this paper's principal claims to the files that back them. That DOI resolves to
+the latest deposited version, and the Zenodo record lists each version with its own DOI for
+readers who want the exact bytes a claim was checked against. \emph{Cite a DOI rather than the
+repository URL:} the DOI resolves to an immutable snapshot, and the URL does not. Re-checking that the archived
 CNFs are unsatisfiable requires \texttt{drat-trim} alone --- not the encoders, not the solver,
 and nothing else in the repository. What a DRAT proof does \emph{not} certify is that a CNF
 faithfully encodes the question asked of it; that is a separate obligation, discharged here by

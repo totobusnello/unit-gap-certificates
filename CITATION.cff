@@ -17,6 +17,11 @@ authors:
     affiliation: "Curious Tech Entrepreneur, São Paulo, Brazil"
 type: software
 license: MIT
+date-released: 2026-07-27
+# Concept DOI: stable across every release, so it is the one that can honestly live inside a
+# snapshot. Each release also receives its own version DOI, minted when the release is cut and
+# therefore not knowable by the files it archives; find it on the Zenodo record.
+doi: 10.5281/zenodo.21630762
 repository-code: "https://github.com/totobusnello/unit-gap-artefacts"
 keywords:
   - circuit complexity
