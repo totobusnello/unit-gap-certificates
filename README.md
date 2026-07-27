@@ -30,21 +30,21 @@ parity of three variables is a counterexample:
 
 Two things are worth separating here, because they have different standing.
 
-**What refutes Theorem 2 is classical, and nothing here is needed for it.** The AIG basis with
-free inversions is exactly `U₂` — the full binary basis minus XOR and XNOR — so Schnorr (1976)
-gives `opt(⊕₃) = 6`, and Khrapchenko's bound forces `tree(⊕₃) ≥ 9` leaves, hence `≥ 8` gates.
-**That already gives `gap ≥ 2 > 1`**, from two published results and one identification, with no
-computation of ours in the chain. The identification is elementary, but it is a step, and it is
-supplied here rather than by Schnorr or Khrapchenko.
+**What refutes Theorem 2 is classical, and no certificate in this repository is needed for it.**
+The AIG basis with free inversions is exactly `U₂` — the full binary basis minus XOR and XNOR — so
+Schnorr (1976) gives `opt(⊕₃) = 6`, and Khrapchenko's bound forces `tree(⊕₃) ≥ 9` leaves, hence
+`≥ 8` gates. **That already gives `gap ≥ 2 > 1`**, from two published results and one
+identification, with no computation of ours in the chain. The identification is elementary, but it
+is a step, and it is supplied by the accompanying note rather than by Schnorr or Khrapchenko.
 
-**What this repository adds is the exact value.** `gap = 3` needs `tree(⊕₃) = 9`, which is not
+**What this repository certifies is the exact value.** `gap = 3` needs `tree(⊕₃) = 9`, which is not
 in the refereed literature — the obvious citation does not survive, since Lee's rank technique
 (STACS 2007) was announced as determining the formula size of parity for every `n` and Lee has
 since [publicly retracted](http://www.cs.columbia.edu/~tl2383/correction.html) that claim. So
 `tree(⊕₃) = 9` is certified here, by two independent dynamic programs and the Lean development,
 and `opt(⊕₃) = 6` by a DRAT chain a reader can re-check with `drat-trim` alone.
 
-The value is not new. An exhaustive enumeration by
+The number is not new. An exhaustive enumeration by
 [Russ Cox and Alex Healy](https://research.swtch.com/boolean), computed in 2010 and published in
 2011, gives parity 9 AND/OR operators at `n = 3` and 15 at `n = 4` — their measure is gates, so
 it matches without conversion. We claim nothing for the number; we say where it comes from.
