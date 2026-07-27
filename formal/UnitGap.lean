@@ -64,7 +64,7 @@ def gates : F → Nat
 /-- `φ` computes `f` (free output inversion in the AIG basis). -/
 def Computes (φ : F) (f : Nat) : Prop := eval φ = f ∨ eval φ = cmpl f
 
-/-! ### Invariante: eval < 256 -/
+/-! ### Invariant: eval < 256 -/
 
 theorem cmpl_lt {v : Nat} : cmpl v < 256 := by unfold cmpl; omega
 
@@ -88,7 +88,7 @@ theorem eval_lt (φ : F) : eval φ < 256 := by
 
 /-! ## DP by cost levels
 
-`lvls c = [D c, D (c−1), …, D 0]` (mais novo primeiro). COMPLETUDE (provada):
+`lvls c = [D c, D (c−1), …, D 0]` (newest first). COMPLETENESS (proved):
 every function computable by a formula with ≤ i gates lies in `D i`. The converse
 direction is not needed for the lower bound. The 4 edge-polarity combinations
 are handled in the step (no closure under complement is required). -/
@@ -161,7 +161,7 @@ theorem headD_lvls (c : Nat) : (lvls c).headD [] = dpAt c c := by
     simp at this
   | cons h t => rfl
 
-/-- O par (D_{c−i}, D_i) aparece em `(lvls c).zip (lvls c).reverse`. -/
+/-- The pair (D_{c−i}, D_i) appears in `(lvls c).zip (lvls c).reverse`. -/
 theorem pair_mem_zip (c i : Nat) (hi : i ≤ c) :
     (dpAt c (c - i), dpAt c i) ∈ ((lvls c).zip (lvls c).reverse) := by
   have hlen : (lvls c).length = c + 1 := lvls_length c
@@ -207,7 +207,7 @@ theorem step_mem {c i : Nat} (hi : i ≤ c) {a b : Nat} {p q : Bool}
   rw [List.any_eq_true]
   exact ⟨(dpAt c (c - i), dpAt c i), pair_mem_zip c i hi, hcomb⟩
 
-/-- Monotonia diagonal: g ∈ D_i ⟹ g ∈ D_c (i ≤ c, g < 256). -/
+/-- Diagonal monotonicity: g ∈ D_i ⟹ g ∈ D_c (i ≤ c, g < 256). -/
 theorem dpAt_mono {c i : Nat} (hi : i ≤ c) {g : Nat}
     (hg : g ∈ dpAt c i) (hg256 : g < 256) : g ∈ dpAt c c := by
   induction c with

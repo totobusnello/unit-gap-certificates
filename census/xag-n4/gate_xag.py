@@ -38,7 +38,7 @@ t0 = time.time()
 lits = []
 for j in range(N):
     lits.append(sum(1 << t for t in range(ROWS) if (t >> j) & 1))
-base = tuple(sorted({0, *lits}))  # constante-0 e literais (complementos via polaridade)
+base = tuple(sorted({0, *lits}))  # constant-0 and literals (complements come from the polarities)
 
 
 def closure_opt_enum(kmax):
@@ -56,7 +56,7 @@ def closure_opt_enum(kmax):
             for w in (v, v ^ MASK):
                 for f in (w,):
                     best.setdefault(f, k)
-        # expandir
+        # expand
         if k == kmax:
             continue
         avail = nodes
@@ -93,8 +93,8 @@ for f in range(256):
     assert sat_opt[f] is not None, f"{f:#04x} has no opt up to k=8"
 print(f"X2b: 256/256 em [{time.time()-t1:.0f}s]; max opt_XAG(n=3) = {max(sat_opt.values())}", flush=True)
 
-# ---------- X2c: cruzamentos ----------
-print("== X2c: cruzamentos ==", flush=True)
+# ---------- X2c: cross-checks ----------
+print("== X2c: cross-checks ==", flush=True)
 # (i) enum vs sat where the enumeration reaches
 mism = [f for f in range(256) if enum_opt[f] <= KMAX_ENUM and enum_opt[f] != sat_opt[f]]
 assert not mism, f"enum != sat em {[(hex(f), enum_opt[f], sat_opt[f]) for f in mism[:5]]}"
@@ -128,7 +128,7 @@ viol = [f for f in range(256) if sat_opt[f] > aig_opt[f]]
 assert not viol, f"opt_XAG > opt_AIG em {[hex(v) for v in viol[:5]]}"
 n_better = sum(1 for f in range(256) if sat_opt[f] < aig_opt[f])
 print(f"X2c(ii): opt_XAG <= opt_AIG on all 256 ✓; XAG strictly better on {n_better} functions [{time.time()-t2:.0f}s]")
-# (iii) paridade-3
+# (iii) parity-3
 assert sat_opt[0x96] == 2, f"opt_XAG(par3) = {sat_opt[0x96]} != 2"
 print(f"X2c(iii): opt_XAG(par3) = 2 ✓ (AIG era {aig_opt[0x96]})")
 # (iv) sampled NPN invariance: permute/negate inputs of 10 functions and compare

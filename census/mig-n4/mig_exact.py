@@ -51,7 +51,7 @@ class MIGEncoder:
         return "lit", (-var if pol else var)
 
     def _maj_clauses(self, s, x, lits):
-        """x <-> MAJ(l1,l2,l3), condicionado a s. lits = [(kind, val), ...].
+        """x <-> MAJ(l1,l2,l3), conditioned on s. lits = [(kind, val), ...].
         Templates: for each pair {li,lj}: (¬x ∨ li ∨ lj) and (x ∨ ¬li ∨ ¬lj)."""
         out = []
         # 3 clauses (-x, li, lj) and 3 (x, -li, -lj), with constants simplified

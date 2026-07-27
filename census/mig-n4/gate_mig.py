@@ -32,7 +32,7 @@ N, ROWS = 3, 8
 MASK = (1 << ROWS) - 1
 t0 = time.time()
 lits = [sum(1 << t for t in range(ROWS) if (t >> j) & 1) for j in range(N)]
-base = tuple(sorted({0, *lits}))  # constante-0 + literais positivos
+base = tuple(sorted({0, *lits}))  # constant-0 + positive literals
 
 
 def maj(a, b, c):
@@ -80,7 +80,7 @@ for f in range(256):
     assert sat_opt[f] is not None, f"{f:#04x} has no opt"
 print(f"M2b: 256/256 em [{time.time()-t1:.0f}s]; max opt_MIG(n=3) = {max(sat_opt.values())}", flush=True)
 
-# ---------- M2c: cruzamentos ----------
+# ---------- M2c: cross-checks ----------
 mism = [f for f in range(256) if enum_opt[f] <= KMAX_ENUM and enum_opt[f] != sat_opt[f]]
 assert not mism, f"enum != sat: {[(hex(f), enum_opt[f], sat_opt[f]) for f in mism[:5]]}"
 mism2 = [f for f in range(256) if enum_opt[f] > KMAX_ENUM and sat_opt[f] <= KMAX_ENUM]

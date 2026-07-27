@@ -104,6 +104,8 @@ SHA-256 of every CNF and DRAT file, so you can confirm you are checking the same
 | Rerun of the source paper's own catalogue checker | `verification/` |
 | Lean 4 formalization | `formal/UnitGap.lean` |
 | Exact-synthesis encoders | `encoders/` |
+| The `n = 4` exact-opt catalogue, re-derived 222/222 | `encoders/npn4_opt_aig.csv` |
+| Qualification gate: UNSAT at `k = opt − 1`, with its DRAT proof | `encoders/g2_0x0016_k6.{cnf,drat}` |
 | Paper source and PDF | `paper/` |
 
 ---
@@ -123,8 +125,10 @@ audit log. Comments and docstrings were translated from Portuguese to English on
 that the code can be read by the people it is addressed to; no logic was touched, and the Lean
 development compiles to byte-identical `#print axioms` output before and after.
 
-The three `.log` files are left exactly as the tools printed them. Editing a transcript would
-falsify the record that `certificates/verify_lowk.log`'s hashes depend on.
+The five `.log` files and the `*_out.txt` transcripts are left exactly as the tools printed
+them; editing a transcript would falsify the record. For the same reason the scripts' own
+`print` strings were left in Portuguese where the archived transcripts contain them — a
+re-run has to stay comparable, line for line, with what is recorded here.
 
 ## Relation to the working repository
 

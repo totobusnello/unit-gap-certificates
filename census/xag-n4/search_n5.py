@@ -16,7 +16,7 @@ IMPORTANT (correction of 2026-07-12; see Appendix B of the paper): an earlier ve
 formula at opt+1 IN ISOLATION and declared UNSAT a separator. That is WRONG for the
 normalized exact-size encoder — UNSAT at EXACTLY opt+1 means "there is no formula
 of opt+1 gates", NOT tree>=opt+2 (a formula of some other size may exist). The bug produced a
-falso positivo em parity-5 (0x69969669, linear, gap 0). A busca ASCENDENTE de opt corrige.
+false positive on parity-5 (0x69969669, linear, gap 0). Searching ASCENDING from opt fixes it.
 
 Uso: python3 search_n5.py <worker_id> <n_workers>
 Output: search_n5_w<id>.csv (all f) + sep_n5_w<id>.jsonl (separators). Resumes by tt.

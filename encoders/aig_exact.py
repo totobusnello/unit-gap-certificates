@@ -71,7 +71,7 @@ class AIGEncoder:
                     # collided with DIMACS literals ±1 — now separate types.
                     ka, la = self._lit(a, pa, t)  # ('const', 0|1) ou ('lit', ±var)
                     kb, lb = self._lit(b, pb, t)
-                    # x <-> la AND lb, condicionado a s
+                    # x <-> la AND lb, conditioned on s
                     if (ka == "const" and la == 0) or (kb == "const" and lb == 0):
                         c.append([-s, -x])           # AND with false => x false
                     elif ka == "const" and kb == "const":  # ambos true

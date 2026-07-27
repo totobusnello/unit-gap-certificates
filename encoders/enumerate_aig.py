@@ -30,7 +30,7 @@ def enumerate_opts(n, max_gates):
             if g not in opt or opt[g] > d:
                 opt[g] = d
 
-    # opt = 0: constantes e literais
+    # opt = 0: constants and literals
     note(0, 0)
     for x in inputs:
         note(x, 0)

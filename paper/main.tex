@@ -333,7 +333,7 @@ basis artifact.
 \paragraph{XAG, $n \le 4$ (exhaustive).} With a native XOR gate, the pipeline (encoder validated by
 an independent exhaustive enumeration at $n = 3$ and by a formula-encoder gate on all 222 $n = 4$
 classes) gives $\optx$ maximum 7 (strictly below AIG in 190/222 classes; $\optx(\oplus_4) = 3$) and
-$\treex$ maximum 7. The gap census (\texttt{certs}: \texttt{npn4\_xag\_gap.csv}): $n = 3$ ---
+$\treex$ maximum 7. The gap census (\texttt{census/xag-n4/npn4\_xag\_gap.csv}): $n = 3$ ---
 $\gapx = 0$ for all 256 functions; $n = 4$ --- $\gapx \in \{0,1\}$, distributed $\{0: 218, 1: 4\}$.
 The unit-gap property, false in AIG, \textbf{holds in XAG for $n \le 4$} under this separately gated
 encoder whose UNSAT instances are not proof-certified (\S\ref{sec:verification}).
@@ -631,8 +631,13 @@ with per-class \texttt{opt\_xag}/\texttt{tree\_xag}/\texttt{gap\_xag}, MIG); CNF
 $k = 1,\dots,5$ DRAT proofs for $\opt(\oplus_3)$ and $k = 1,\dots,3$ for the representative child;
 the \texttt{drat-trim} transcript \texttt{certificates/verify\_lowk.log} (\texttt{s VERIFIED}, exit code,
 and CNF/DRAT SHA-256 for all eight proofs); the $n = 5$ search CSVs (raw per-worker and globally
-deduplicated) and the 494/494 re-verification log; and the Lean sources. The $n = 5$ search seeds
-are deterministic per worker; the bench is a 2-vCPU VPS.
+deduplicated) and the 494/494 re-verification log; and the Lean sources. Both implementations of
+the $\tree$ recurrence are included --- the layered dynamic program and the independent global
+Bellman fixed point --- together with the transcript recording their agreement on all
+65{,}536 cells. The rerun of the source catalogue's own checker is under
+\texttt{verification/}; its two inputs and the checker itself are \emph{not} redistributed
+(that repository carries no licence), and the SHA-256 needed to confirm them are. The $n = 5$
+search seeds are deterministic per worker; the bench is a 2-vCPU VPS.
 \end{sloppypar}
 
 \end{document}

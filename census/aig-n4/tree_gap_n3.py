@@ -1,4 +1,4 @@
-"""Unit Gap check n=3 v2: opt via encoder+kissat (enumerador explode em k=8); tree via Bellman correto."""
+"""Unit Gap check at n=3, v2: opt via encoder+kissat (enumeration blows up at k=8); tree via the correct Bellman."""
 import subprocess, sys, tempfile, os, time
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "encoders"))
 from aig_exact import AIGEncoder, trivial_opt
