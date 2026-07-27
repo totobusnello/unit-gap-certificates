@@ -49,7 +49,9 @@ Two independent routes reach the same place, which is the point:
    was announced as determining the formula size of parity for every `n`, and Lee has since
    [publicly retracted](http://www.cs.columbia.edu/~tl2383/correction.html) that claim.
 
-The certificates in this repository replicate that value mechanically. They no longer carry it.
+Neither side of that gap rests on this repository. The DRAT certificates re-establish
+`opt(⊕₃) = 6` mechanically; the dynamic programs and the Lean development do the same for
+`tree(⊕₃) = 9`. What refutes Theorem 2 is the classical route above.
 
 The failure is structural, not a lucky single function. An exhaustive census over the 222 NPN
 classes of `n = 4` finds **72 classes (32.4%) with gap ≥ 2**, the maximum gap being 6, attained

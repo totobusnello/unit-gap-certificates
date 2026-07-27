@@ -54,9 +54,9 @@ $\opt(\oplus_3) = 6$; Khrapchenko forces $\tree(\oplus_3) \ge 9$ leaves, hence $
 formula with $L$ leaves has $L-1$ gates). \textbf{So $\gapop(\oplus_3) \ge 2 > 1$ follows from
 two published results and the basis identification above, with no computation of ours in the
 chain: Theorem~2 was already contradicted by the literature.} The exact value 3 needs
-$\tree(\oplus_3) = 9$, which is not in the refereed literature; it is certified here by the DRAT
-chain, two independent dynamic programs and the Lean development, and agrees with an exhaustive
-enumeration published informally in 2011. At $n = 4$ the exact gap is classical again: Tarui
+$\tree(\oplus_3) = 9$, which is not in the refereed literature; that side is certified here by
+two independent dynamic programs and the Lean development (the circuit side, $\opt = 6$, by the
+DRAT chain), and agrees with an exhaustive enumeration published informally in 2011. At $n = 4$ the exact gap is classical again: Tarui
 determined the De~Morgan formula size of $\oplus_n$ for $n = 2^k$ to be exactly $n^2$ leaves,
 giving $\gapop(\oplus_4) = 15 - 9 = 6$ --- the maximum of the census below. The error is locatable in the
 paper: \S2 displays $\tree(f) = \min(1 + \opt(a) + \opt(b))$ (the DAG measure $\opt$ in the
@@ -224,24 +224,20 @@ under the \S3 reading, Theorem~2 is false.
   by \texttt{tree\_gap\_n3.py}; the per-cost histogram above was re-derived independently during
   review.}
 
-  \item \textbf{Analytic fail-safe.} Khrapchenko~\cite{khrapchenko1971}: $L(\oplus_3) \ge |E|^2/(|A||B|) = 144/16 = 9$
-  leaves, hence $\ge 8$ two-input gates. Together with the explicit six-gate circuit
-  ($\opt \le 6$), $\gapop(\oplus_3) \ge 2$ follows \textbf{using only Khrapchenko and that circuit}
-  --- independent of the tree DP and the DRAT chain. Substituting Schnorr's theorem for the
-  explicit circuit makes the fail-safe entirely citational: $\opt(\oplus_3) = 6$~\cite{schnorr1976}
-  and $\tree(\oplus_3) \ge 8$ (Khrapchenko) yield $\gapop(\oplus_3) \ge 2 > 1$ from two published
-  classical results and the basis identification of \S\ref{sec:prelim}, with no computation of
-  ours in the chain.
-
-  \emph{Beyond the fail-safe, the exact value is also classical.} The identification of \S\ref{sec:prelim} extends from circuits
-  to formulas: with free complementation every $U_2$ gate is an AND or an OR of its two arguments up
-  to edge inversions, so pushing inversions to the leaves turns an AIG formula into a De~Morgan
-  formula with the same number of binary gates and back. Hence
+  \item \textbf{The refutation is citational.} The identification of \S\ref{sec:prelim} extends
+  from circuits to formulas: with free complementation every $U_2$ gate is an AND or an OR of its
+  two arguments up to edge inversions, so pushing inversions to the leaves turns an AIG formula
+  into a De~Morgan formula with the same number of binary gates and back. Hence
   $\tree = \tree_{U_2} = \tree_{\mathrm{De\,Morgan}}$, and a binary formula with $L$ leaves has
-  $L - 1$ gates --- the same conversion already used for Khrapchenko above. So Khrapchenko gives
-  $\tree(\oplus_3) \ge 9$ leaves, i.e. $\ge 8$ gates, and with $\opt(\oplus_3) = 6$ this already
-  contradicts Theorem~2: $\gapop(\oplus_3) \ge 2 > 1$, from two published results and the
-  identification above.
+  $L-1$ gates. Khrapchenko~\cite{khrapchenko1971} then gives
+  $L(\oplus_3) \ge |E|^2/(|A||B|) = 144/16 = 9$ leaves, hence $\tree(\oplus_3) \ge 8$ gates.
+  Together with the explicit six-gate circuit ($\opt \le 6$), $\gapop(\oplus_3) \ge 2$ follows
+  \textbf{using only Khrapchenko and that circuit} --- independent of the tree DP and the DRAT
+  chain. Substituting Schnorr's theorem for the explicit circuit removes even that:
+  $\opt(\oplus_3) = 6$~\cite{schnorr1976} and $\tree(\oplus_3) \ge 8$ (Khrapchenko) yield
+  $\gapop(\oplus_3) \ge 2 > 1$ from two published classical results and the basis identification
+  of \S\ref{sec:prelim}, with no computation of ours in the chain. \textbf{That alone contradicts
+  Theorem~2.}
 
   The \emph{exact} value is a different matter. For $n = 2^k$ Tarui~\cite{tarui2010} showed that
   Khrapchenko's $n^2$ is attained, so the formula size is exactly $n^2$ leaves; this fixes
@@ -574,8 +570,8 @@ responsible for all claims. Correctness does not rest on that process: the circu
 carrying the refutation --- $\opt(\oplus_3) \ge 6$ and the shared-child bound --- are DRAT proofs
 checked by \texttt{drat-trim} (the census UNSAT sides are gated but not proof-certified, as
 \S\ref{sec:verification} declares), the formula-size counterexample is checked by the
-Lean~4 kernel except where \texttt{native\_decide} is declared, and the analytic fail-safe
-(Khrapchenko) is independent of both. Before the results were communicated externally, the package
+Lean~4 kernel except where \texttt{native\_decide} is declared, and the citational route
+(Schnorr and Khrapchenko), which is what refutes Theorem~2, is independent of both. Before the results were communicated externally, the package
 was reviewed adversarially by four independent language-model families; that review is provenance,
 not verification.
 
