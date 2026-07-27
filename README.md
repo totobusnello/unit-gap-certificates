@@ -24,34 +24,30 @@ parity of three variables is a counterexample:
 |  |  |
 |---|---|
 | `opt(⊕₃)` | **6** — UNSAT for every gate count `k = 1..5`, each certified by a DRAT proof |
-| `tree(⊕₃)` | **9** |
+| `tree(⊕₃)` | **9** — two independent dynamic programs, and the Lean development |
 | gap | **3** — against a claimed maximum of 1 |
 | Krinkin's own `s = \|Dₐ ∩ D_b\|` | **3** — against a claimed maximum of 1 |
 
-Two independent routes reach the same place, which is the point:
+Two things are worth separating here, because they have different standing.
 
-1. **Certificate route.** Exact synthesis via SAT, with a DRAT proof for each UNSAT step,
-   checked by `drat-trim`.
-2. **Classical route, no solver at all.** The AIG basis with free inversions is exactly `U₂` —
-   the full binary basis minus XOR and XNOR — so Schnorr (1976) gives `opt(⊕₃) = 6`, and
-   Khrapchenko's classical bound forces `tree(⊕₃) ≥ 9` leaves, hence `≥ 8` gates. **So
-   `gap ≥ 2 > 1` closes from two published results and that one identification, with no
-   computation of ours in the chain** — Theorem 2 was already contradicted by the literature.
-   The identification is elementary, but it is a step, and it is supplied here rather than by
-   Schnorr or Khrapchenko.
+**What refutes Theorem 2 is classical, and nothing here is needed for it.** The AIG basis with
+free inversions is exactly `U₂` — the full binary basis minus XOR and XNOR — so Schnorr (1976)
+gives `opt(⊕₃) = 6`, and Khrapchenko's bound forces `tree(⊕₃) ≥ 9` leaves, hence `≥ 8` gates.
+**That already gives `gap ≥ 2 > 1`**, from two published results and one identification, with no
+computation of ours in the chain. The identification is elementary, but it is a step, and it is
+supplied here rather than by Schnorr or Khrapchenko.
 
-   The **exact** value 3 is a different matter: it needs `tree(⊕₃) = 9`, which is not in the
-   refereed literature. It is certified here, and it agrees with the exhaustive enumeration
-   published by [Russ Cox and Alex Healy](https://research.swtch.com/boolean) in 2011, which
-   gives parity 9 AND/OR operators at `n = 3` and 15 at `n = 4`.
+**What this repository adds is the exact value.** `gap = 3` needs `tree(⊕₃) = 9`, which is not
+in the refereed literature — the obvious citation does not survive, since Lee's rank technique
+(STACS 2007) was announced as determining the formula size of parity for every `n` and Lee has
+since [publicly retracted](http://www.cs.columbia.edu/~tl2383/correction.html) that claim. So
+`tree(⊕₃) = 9` is certified here, by two independent dynamic programs and the Lean development,
+and `opt(⊕₃) = 6` by a DRAT chain a reader can re-check with `drat-trim` alone.
 
-   The obvious citation for the exact value does not survive: Lee's rank technique (STACS 2007)
-   was announced as determining the formula size of parity for every `n`, and Lee has since
-   [publicly retracted](http://www.cs.columbia.edu/~tl2383/correction.html) that claim.
-
-Neither side of that gap rests on this repository. The DRAT certificates re-establish
-`opt(⊕₃) = 6` mechanically; the dynamic programs and the Lean development do the same for
-`tree(⊕₃) = 9`. What refutes Theorem 2 is the classical route above.
+The value is not new. An exhaustive enumeration by
+[Russ Cox and Alex Healy](https://research.swtch.com/boolean), computed in 2010 and published in
+2011, gives parity 9 AND/OR operators at `n = 3` and 15 at `n = 4` — their measure is gates, so
+it matches without conversion. We claim nothing for the number; we say where it comes from.
 
 The failure is structural, not a lucky single function. An exhaustive census over the 222 NPN
 classes of `n = 4` finds **72 classes (32.4%) with gap ≥ 2**, the maximum gap being 6, attained
@@ -97,7 +93,7 @@ SHA-256 of every CNF and DRAT file, so you can confirm you are checking the same
 
 ---
 
-## Where the artifacts are
+## Where the artefacts are
 
 | Claim in the paper | File |
 |---|---|
