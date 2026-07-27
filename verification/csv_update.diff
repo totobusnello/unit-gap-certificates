@@ -1,0 +1,14 @@
+--- npn4_original.csv	2026-07-11 12:46:01
++++ npn4_updated.csv	2026-07-11 12:46:19
+@@ -181,9 +181,9 @@
+ 0x07f8,2040,5,exact
+ 0x0ff0,4080,3,exact
+ 0x1668,5736,9,exact
+-0x1669,5737,10,improved_ub
++0x1669,5737,10,exact
+ 0x166a,5738,9,exact
+-0x166b,5739,10,improved_ub
++0x166b,5739,10,exact
+ 0x166e,5742,9,exact
+ 0x167e,5758,9,exact
+ 0x1681,5761,10,exact

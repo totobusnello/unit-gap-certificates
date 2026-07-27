@@ -1,0 +1,39 @@
+{
+  "upload_type": "software",
+  "title": "unit-gap-certificates: machine-checkable artefacts for a refutation of Theorem 2 of arXiv:2603.08033",
+  "creators": [
+    {
+      "name": "Busnello, Luiz Antonio",
+      "affiliation": "Curious Tech Entrepreneur, São Paulo, Brazil"
+    }
+  ],
+  "description": "<p>DRAT proof certificates, exhaustive NPN-class gap censuses, exact-synthesis encoders, and a Lean 4 formalization supporting a refutation of Theorem 2 of Krinkin, <em>The Unit Gap: How Sharing Works in Boolean Circuits</em> (arXiv:2603.08033).</p><p><strong>What this is not:</strong> progress on P vs NP. It is a correction to one published claim about the gap between DAG-optimal and formula-optimal And-Inverter Graph size, plus the data behind it.</p><p>The counterexample is parity on three inputs, where the DAG optimum is 6 gates and the formula optimum is 9, so the gap is 3 rather than the claimed maximum of 1. Both endpoints are classical: the AIG basis with free inversions is exactly U2 (the full binary basis minus XOR and XNOR), so Schnorr (1976) gives 3n-3 for the circuit side — an equality restated in the openly accessible Morizumi, arXiv:1504.06731, since the 1976 original is not — and Lee (STACS 2007) gives the exact De Morgan formula size for the formula side. That identification is elementary, but it is a step, and it is supplied by the accompanying note rather than by Schnorr or Lee. The artefacts here replicate the two values mechanically — the DRAT certificates on the circuit side, the Lean development on the formula side — rather than carry the argument.</p><p>An exhaustive census over the 222 NPN classes of n = 4 finds 72 classes (32.4%) with gap at least 2, the maximum being 6 — which is exactly what Schnorr and Lee predict for parity-4, an external check on the pipeline.</p><p>The DRAT proofs are self-contained: re-checking them requires only drat-trim, not the encoder or the solver. See README.md for the claim-to-file table and the re-check command.</p>",
+  "keywords": [
+    "circuit complexity",
+    "And-Inverter Graph",
+    "exact synthesis",
+    "formula size",
+    "DRAT",
+    "SAT solving",
+    "Boolean functions",
+    "NPN classification",
+    "reproducibility"
+  ],
+  "license": "MIT",
+  "access_right": "open",
+  "language": "eng",
+  "related_identifiers": [
+    {
+      "identifier": "arXiv:2603.08033",
+      "relation": "references",
+      "resource_type": "publication-preprint",
+      "scheme": "arxiv"
+    },
+    {
+      "identifier": "arXiv:1504.06731",
+      "relation": "references",
+      "resource_type": "publication-preprint",
+      "scheme": "arxiv"
+    }
+  ]
+}

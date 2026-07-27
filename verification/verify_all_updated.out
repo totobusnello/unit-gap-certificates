@@ -1,0 +1,31 @@
+Lipschitz Bound Verification (n=4)
+==================================================
+
+Total NPN classes:   222
+  Exact:             222
+  Upper bound:       0
+
+Exact-exact edges:   995
+Max |diff_opt|:      4
+
+Distribution of |diff_opt|:
+  |diff|   count        %
+  ------  ------  -------
+       0     301    30.3%
+       1     421    42.3%
+       2     221    22.2%
+       3      45     4.5%
+       4       7     0.7%
+  ------  ------  -------
+   total     995   100.0%
+
+Tight edges (|diff| = 4): 7
+  0x0001 (opt=3) -- 0x0180 (opt=7)
+  0x0003 (opt=2) -- 0x0181 (opt=6)
+  0x0007 (opt=3) -- 0x0119 (opt=7)
+  0x000f (opt=1) -- 0x01aa (opt=5)
+  0x001f (opt=3) -- 0x01ea (opt=7)
+  0x0356 (opt=5) -- 0x19e1 (opt=9)
+  0x0357 (opt=3) -- 0x0776 (opt=7)
+
+PASS: Lipschitz bound |diff_opt| <= 4 verified on all 995 edges

@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use these artefacts, please cite the archived Zenodo record rather than the repository URL."
+title: "unit-gap-certificates: machine-checkable artefacts for a refutation of Theorem 2 of arXiv:2603.08033"
+abstract: >-
+  DRAT proof certificates, exhaustive NPN-class gap censuses, exact-synthesis
+  encoders, and a Lean 4 formalization supporting a refutation of Theorem 2 of
+  Krinkin, "The Unit Gap: How Sharing Works in Boolean Circuits"
+  (arXiv:2603.08033). The counterexample is parity on three inputs, where the
+  DAG optimum is 6 gates and the formula optimum is 9, so the gap is 3 rather
+  than the claimed maximum of 1. Both endpoints are classical: Schnorr (1976)
+  for U2 circuit size and Lee (STACS 2007) for De Morgan formula size.
+authors:
+  - family-names: Busnello
+    given-names: Luiz Antonio
+    affiliation: "Curious Tech Entrepreneur, São Paulo, Brazil"
+type: software
+license: MIT
+repository-code: "https://github.com/totobusnello/unit-gap-certificates"
+keywords:
+  - circuit complexity
+  - And-Inverter Graph
+  - exact synthesis
+  - formula size
+  - DRAT
+  - SAT solving
+  - Boolean functions
+  - NPN classification
+  - reproducibility
+references:
+  - type: article
+    title: "The Unit Gap: How Sharing Works in Boolean Circuits"
+    authors:
+      - family-names: Krinkin
+        given-names: Kirill
+    identifiers:
+      - type: other
+        value: "arXiv:2603.08033"

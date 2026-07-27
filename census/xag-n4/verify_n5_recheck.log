@@ -1,0 +1,13 @@
+alvos: 294 gap1 + 200 gap0 (amostra) = 494
+  50/494 (ok 50, bad 0)
+  100/494 (ok 100, bad 0)
+  150/494 (ok 150, bad 0)
+  200/494 (ok 200, bad 0)
+  250/494 (ok 250, bad 0)
+  300/494 (ok 300, bad 0)
+  350/494 (ok 350, bad 0)
+  400/494 (ok 400, bad 0)
+  450/494 (ok 450, bad 0)
+
+VERIFICADAS POR SIMULACAO: 494/494
+todas as instancias re-decodificadas simulam a tt (circuito opt + formula tree)

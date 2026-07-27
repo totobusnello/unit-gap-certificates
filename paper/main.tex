@@ -1,0 +1,638 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{microtype}
+\usepackage[margin=1in]{geometry}
+\usepackage[hidelinks]{hyperref}
+
+\DeclareMathOperator{\opt}{opt}
+\DeclareMathOperator{\tree}{tree}
+\DeclareMathOperator{\gapop}{gap}
+\newcommand{\optx}{\opt_{\mathrm{XAG}}}
+\newcommand{\treex}{\tree_{\mathrm{XAG}}}
+\newcommand{\gapx}{\gapop_{\mathrm{XAG}}}
+\newcommand{\treemig}{\tree_{\mathrm{MIG}}}
+
+\theoremstyle{plain}
+\newtheorem*{claim}{Claim}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\title{The Unit Gap Is Base-Dependent:\\
+A Mechanically Verified Refutation and a Cross-Base Census}
+\author{%
+  Luiz Antonio Busnello \\
+  Curious Tech Entrepreneur \\
+  S\~{a}o Paulo, Brazil \\
+  \texttt{lab@generantis.com.br} \\
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Krinkin's \emph{The Unit Gap: How Sharing Works in Boolean Circuits} (arXiv:2603.08033v2) asserts
+that for every Boolean function the minimum formula size exceeds the minimum circuit size by at most
+one gate --- Theorem~2: $\gapop \in \{0,1\}$ in the And-Inverter Graph (AIG) cost model --- with a
+decomposition corollary bounding a shared-gate term $s \in \{0,1\}$ (Corollary~6). We refute both.
+Under the paper's own definition of a formula (fan-out one at every gate), the parity of three
+variables ($\oplus_3$) is a counterexample: $\opt(\oplus_3) = 6$ --- UNSAT for every gate count
+$k = 1,\dots,5$, each certified by a DRAT proof checked with \texttt{drat-trim} --- while
+$\tree(\oplus_3) = 9$, giving gap~3; in the optimal six-gate circuit the two output-child sub-DAGs
+intersect in a three-gate parity-2 block, so Krinkin's own term $s = |D_a \cap D_b| = 3$.
+\textbf{Both sides of that gap are classical.} The AIG basis with free inversions is $U_2$, where
+Schnorr's theorem gives the circuit complexity of $\oplus_n$ as exactly $3n-3$, and Lee's rank
+technique gives the De~Morgan formula size of $\oplus_n$ as exactly $2^{\ell}(2^{\ell}+3r)$ leaves
+for $n = 2^{\ell}+r$ --- 6 and 9 gates respectively at $n = 3$ (a formula with $L$ leaves has
+$L-1$ gates). \textbf{So $\gapop(\oplus_3) = 3$
+follows from two published results and the basis identification above, with no computation of
+ours in the chain}; the certificates,
+the dynamic programs and the Lean development replicate that value mechanically rather than
+establish it. (A weaker route needs even less: Khrapchenko forces $\tree(\oplus_3) \ge 8$, which
+with the six-gate circuit already gives $\gapop \ge 2 > 1$.) The error is locatable in the
+paper: \S2 displays $\tree(f) = \min(1 + \opt(a) + \opt(b))$ (the DAG measure $\opt$ in the
+children), while \S3's Bellman operator is $(Tv)(f) = \min(1 + v(a) + v(b))$ (the recursive
+measure); these are incompatible characterizations of formula size, the first making Theorem~2 a
+one-line consequence and the second making it false (its fixed point overshoots $\opt(\oplus_3)$ by
+3). An exhaustive census over the 222 NPN classes of $n = 4$ shows the failure is structural: 72 of
+222 classes have $\gapop \ge 2$, the maximum gap 6 attained by three distinct
+NPN classes (distinguished by their XAG optima 6/5/3), one of which is parity-4. Finally, the
+phenomenon is \textbf{base-dependent}. In the XOR-AND-graph (XAG) basis the unit-gap property holds
+for $n \le 4$ (under a separately gated exact-synthesis pipeline whose UNSAT side is not
+proof-certified): $\gapx = 0$ for all 256 functions of $n = 3$ and $\gapx \in \{0,1\}$ for all 222
+classes of $n = 4$; a directed search over 25{,}373 distinct essential functions of $n = 5$
+\textbf{found no separator}: all 25{,}169 gap-decided functions have $\gapx \in \{0,1\}$, and 204
+remain unresolved. A replicated MIG census matching Soeken et al.'s published size
+distribution bucket by bucket gives an aggregate external cross-check. The large AIG gaps are
+consistent with the cost of simulating linear (parity) structure without a native XOR gate.
+\end{abstract}
+
+\section{Introduction}
+
+The relationship between \textbf{formula size} (the smallest fan-out-one circuit for a function) and
+\textbf{circuit size} (the smallest circuit of any fan-out) is one of the oldest quantitative
+questions in Boolean complexity. Their difference measures how much \emph{sharing} --- reusing an
+intermediate result at more than one place --- can buy. Krinkin's \emph{The Unit Gap} claims that in
+the And-Inverter Graph model this difference is \textbf{at most one gate} for every Boolean function
+(Theorem~2), with a decomposition corollary bounding the sharing (Corollary~6).
+
+It is not true. This paper does three things.
+
+\begin{enumerate}
+  \item \textbf{We refute Theorem~2 and Corollary~6} at $n = 3$ (parity), where the gap is 3 and
+  Krinkin's shared-gate term is 3. \emph{The counterexample is not new mathematics}: both sides of
+  the gap were determined decades ago --- Schnorr for the circuit, Lee for the formula --- so the
+  contradiction with Theorem~2 was already implied by the published literature. What we add is to
+  notice it, to certify it mechanically (a DRAT chain at every $k = 1,\dots,5$ checked by an
+  independent tool, two dynamic programs, and a Lean~4 formalization), and above all \textbf{to
+  locate the error inside the paper}: \S2 and \S3 give incompatible characterizations of
+  $\tree(f)$, one making Theorem~2 trivially true and the other making it false. A refutation that
+  only exhibits a counterexample leaves the author guessing where the argument broke; this one does
+  not.
+
+  \item \textbf{We show the failure is structural}, computing the complete gap census over all 222
+  NPN classes of $n = 4$: 32.4\% of classes violate the unit-gap bound, the maximum gap, 6, attained by
+  three distinct NPN classes, one being parity.
+
+  \item \textbf{We show the phenomenon is base-dependent.} The property, false in AIG, holds in the
+  XAG basis for $n \le 4$ (exhaustive); a large directed search at $n = 5$ found no counterexample
+  among the functions it decided. The large parity
+  AIG gaps are consistent with the price of simulating parity without a native XOR gate.
+\end{enumerate}
+
+Our method is \textbf{exact synthesis via SAT}: ``is there a $k$-gate circuit for $f$?'' is a CNF
+decided by a modern solver. The encoder is a normalized exact-size encoding (every non-output gate
+used, no duplicate gates); by a minimality lemma, $\opt(f) = k$ implies the $k$-encoding is
+satisfiable, so a lower bound $\opt(f) \ge m$ requires UNSAT at \emph{every} $k = 1,\dots,m-1$ ---
+which is why our circuit lower bounds certify the whole chain, not just the last step. The package
+was reviewed adversarially by four independent language-model families before external
+communication; the mathematics rests on the certificates, not that review. We claim novelty only for
+the refutation and for the gap-by-basis census; the individual optimal-size tables in XAG and MIG
+are classical or previously published.
+
+\section{Preliminaries}
+\label{sec:prelim}
+
+We quote the paper's definitions to fix the target precisely (arXiv:2603.08033v2, \S2;
+notation-normalized).
+
+\begin{quote}
+\itshape
+A circuit is an AIG where gates may have fan-out greater than one. A formula (or tree circuit) has
+fan-out exactly one at every gate. We write $\tree(f)$ for the minimum formula size. Since every
+formula is a circuit, $\tree(f) \ge \opt(f)$. The gap is $\gapop(f) = \tree(f) - \opt(f)$.
+\end{quote}
+
+And, for the decomposition (\S2):
+
+\begin{quote}
+\itshape
+Every AIG gate computes $f = a \wedge b$ (with possible edge complementation). The minimum formula
+size satisfies $\tree(f) = \min$ over $a,b$: $f = a \wedge b$ or $f = \neg(a \wedge b)$ of
+$(1 + \opt(a) + \opt(b))$. The trivial decomposition $f = 1 \wedge f$ always achieves $1 + \opt(f)$.
+\end{quote}
+
+An \textbf{AIG} over $x_1,\dots,x_n$ and the constant 1 is a DAG of two-input AND gates with free
+edge complementation; $\opt(f)$ is the minimum number of AND gates. With free complementation an
+AND gate realises every binary Boolean function except XOR and XNOR at unit cost, so the AIG basis
+is exactly $U_2$, and $\opt$ coincides gate for gate with $U_2$-circuit size. \emph{The
+exclusion of XOR is what makes this basis the right one for the classical results used below:}
+$U_2$ is the full binary basis $B_2$ \emph{minus} XOR and XNOR, so parity is not free in it. (The output gate has
+fan-out zero; the ``fan-out one'' condition is Krinkin's, for the non-output gates of a tree.) An
+\textbf{XAG} adds a native XOR gate; an \textbf{MIG} (Majority-Inverter Graph) uses 3-input majority gates. All exhaustive
+results are for $n \le 4$.
+
+\paragraph{Exact synthesis.} For fixed $(n, k)$ we one-hot--select each gate's operation and
+operands among earlier nodes and constrain the output to compute $f$ up to polarity. The encoding is
+\emph{normalized}: every non-output gate must be used and duplicate gate options are forbidden.
+These are sound for minimality: SAT at $k$ yields a valid $k$-gate circuit, and if $\opt(f) = k$ a
+minimality lemma guarantees the $k$-encoding is satisfiable. Hence $\opt(f)$ is the least $k$ with
+SAT, and a lower bound $\opt(f) \ge m$ requires UNSAT at \emph{every} $k = 1,\dots,m-1$. Restricting
+selection to fan-out one turns the same encoder into a $\tree(f)$ oracle (validated in
+Appendix~\ref{app:encoders}).
+
+\section{The refutation at \texorpdfstring{$n = 3$}{n = 3}}
+\label{sec:refutation}
+
+\paragraph{The paper gives incompatible characterizations of $\tree(f)$.} The \S2 identity puts the
+DAG measure $\opt$ in the children; with $\opt$ there, the trivial decomposition $f = 1 \wedge f$
+yields $\tree(f) \le 1 + \opt(f)$ for every $f$, so Theorem~2 is a one-line consequence --- but the
+minimized object is not a tree (the children may be internally shared DAGs). In \S3, however, the
+paper defines the Bellman operator (notation-normalized):
+
+\begin{quote}
+\itshape
+$(Tv)(f) = \min$ over $a,b$: $f = a \wedge b$ of $(1 + v(a) + v(b))$; iterating $T$ from the base
+case $v_0(x_i) = v_0(1) = 0$ computes $\tree(f)$.
+\end{quote}
+
+with the \textbf{recursive} measure $v$ in the children. At its fixed point this reads
+$\tree(f) = \min(1 + \tree(a) + \tree(b))$, a different object from the \S2 identity: as global
+characterizations of formula size the two coincide term-by-term only on children for which
+$\opt = \tree$. Krinkin further states --- as a \emph{consequence of Theorem~2}, not a definition ---
+that $T$'s fixed point ``overshoots $\opt(f)$ by exactly $\gapop(f) \in \{0,1\}$'', which collapses
+together with Theorem~2. For $\oplus_3$ the recursive $T$ computes 9, overshooting $\opt = 6$ by 3;
+under the \S3 reading, Theorem~2 is false.
+
+\begin{itemize}
+  \item \textbf{$\opt(\oplus_3) = 6$.} \emph{Upper bound:} the six-gate circuit
+  \begin{equation}\label{eq:c6}
+  \begin{aligned}
+    g_1 &= x_1 \wedge \neg x_2, &\qquad g_3 &= \neg g_1 \wedge \neg g_2, &\qquad g_5 &= g_3 \wedge x_3,\\
+    g_2 &= \neg x_1 \wedge x_2, &\qquad g_4 &= \neg g_3 \wedge \neg x_3, &\qquad g_6 &= \neg g_4 \wedge \neg g_5,
+  \end{aligned}
+  \end{equation}
+  with output $\neg g_6$ (inversions are free, so the output polarity costs nothing). Here
+  $g_3 = \neg(x_1 \oplus x_2)$ is the \emph{only} gate of fan-out two, which is exactly why the
+  circuit is not a tree; the two children of the output, $g_4$ and $g_5$, have sub-DAGs meeting in
+  $\{g_1, g_2, g_3\}$ --- this is the $s = 3$ of the Corollary~6 refutation below, and it can be
+  read off the display. Verified by simulation on all eight inputs and in Lean~4.
+  \emph{Lower bound:}
+  UNSAT at \textbf{every $k = 1,2,3,4,5$} (kissat~4.0.4), each with a DRAT proof checked by
+  \texttt{drat-trim} (\texttt{s VERIFIED}; transcript and hashes in Appendix~\ref{app:repro}). The
+  full $k = 1,\dots,5$ chain --- not only $k = 5$ --- certifies $\opt \ge 6$ under the normalized
+  exact-size encoding. \emph{The value is also classical:} since the AIG basis is $U_2$ (\S\ref{sec:prelim}),
+  Schnorr's theorem --- the $U_2$ circuit complexity of $\oplus_n$ is exactly
+  $3n-3$~\cite{schnorr1976}, an equality restated in~\cite{morizumi2015}\footnote{We cite the
+  1976 original for the result and a modern, openly accessible source for the statement of the
+  equality; the original was not consulted directly.} --- gives $\opt(\oplus_3) = 6$ and $\opt(\oplus_4) = 9$ directly, in
+  agreement with the values computed here.
+
+  \item \textbf{$\tree(\oplus_3) = 9$.} \emph{Upper bound:} the nine-gate formula is
+  \eqref{eq:c6} with the shared block duplicated, which is what fan-out one forces:
+  \begin{equation}\label{eq:w9}
+    \neg\bigl(\,\neg P_1 \wedge \neg x_3\,\bigr) \wedge \neg\bigl(\,P_2 \wedge x_3\,\bigr),
+    \qquad P_1 = P_2 = \neg(x_1 \oplus x_2),
+  \end{equation}
+  where each $P_i$ is a private three-gate copy of the block that \eqref{eq:c6} computes once as
+  $g_3$. Counting: $3 + 3$ for the two copies, plus the three gates above them, is 9; the circuit
+  pays $3$ for one copy plus the same three, which is 6. \textbf{The gap is the duplicated block},
+  and its size is Krinkin's $s = 3$. Checked the same way as~\eqref{eq:c6}. \emph{Lower bound:} the exact fixed point of the tree recursion over all 256
+  functions, independently confirmed by a layer-by-layer enumeration (new functions per cost
+  $1,\dots,9$: 24, 64, 30, 80, 32, 0, 16, 0, 2 --- the two cost-9 functions are parity and its
+  complement).\footnote{The gap distribution at $n = 3$ (\{gap 0: 214, 1: 40, 3: 2\}) is reproduced
+  by \texttt{tree\_gap\_n3.py}; the per-cost histogram above was re-derived independently during
+  review.}
+
+  \item \textbf{Analytic fail-safe.} Khrapchenko~\cite{khrapchenko1971}: $L(\oplus_3) \ge |E|^2/(|A||B|) = 144/16 = 9$
+  leaves, hence $\ge 8$ two-input gates. Together with the explicit six-gate circuit
+  ($\opt \le 6$), $\gapop(\oplus_3) \ge 2$ follows \textbf{using only Khrapchenko and that circuit}
+  --- independent of the tree DP and the DRAT chain. Substituting Schnorr's theorem for the
+  explicit circuit makes the fail-safe entirely citational: $\opt(\oplus_3) = 6$~\cite{schnorr1976}
+  and $\tree(\oplus_3) \ge 8$ (Khrapchenko) yield $\gapop(\oplus_3) \ge 2 > 1$ from two published
+  classical results and the basis identification of \S\ref{sec:prelim}, with no computation of
+  ours in the chain.
+
+  \emph{Beyond the fail-safe, the exact value is also classical.} The identification of \S\ref{sec:prelim} extends from circuits
+  to formulas: with free complementation every $U_2$ gate is an AND or an OR of its two arguments up
+  to edge inversions, so pushing inversions to the leaves turns an AIG formula into a De~Morgan
+  formula with the same number of binary gates and back. Hence
+  $\tree = \tree_{U_2} = \tree_{\mathrm{De\,Morgan}}$, and a binary formula with $L$ leaves has
+  $L - 1$ gates --- the same conversion already used for Khrapchenko above. Lee~\cite{lee2007} then
+  determines the De~Morgan formula size of parity for every $n$: writing $n = 2^{\ell} + r$ with
+  $0 \le r < 2^{\ell}$, the minimum number of leaves is exactly $2^{\ell}(2^{\ell} + 3r)$. For
+  $n = 3$ this is 10 leaves, hence 9 two-input gates --- the value the dynamic program and the Lean
+  development compute independently. So Theorem~2 is contradicted by Schnorr and Lee alone. Lee's expression also
+  explains why the Khrapchenko route stops at $\ge 2$: equality with $n^2$ holds exactly when
+  $r = 0$, and Lee notes that no bound above $n^2$ is reachable by Khrapchenko's method at all.
+  The same two results predict $\gapop(\oplus_4) = 15 - 9 = 6$, which is the maximum gap found in
+  the $n = 4$ census of \S\ref{sec:census} --- an external check on the census, not merely on the
+  counterexample.
+\end{itemize}
+
+Hence $\gapop(\oplus_3) = 3$, refuting Theorem~2.
+
+\paragraph{Corollary 6 is refuted with Krinkin's own definition.} He states (\S5;
+notation-normalized):
+
+\begin{quote}
+\itshape
+Let $C$ be an optimal AIG, and let $g$ be any gate computing $f = a \wedge b$. Let $D_a, D_b$ be the
+sub-DAGs computing $a$ and $b$. Then $\opt(f) = 1 + \opt(a) + \opt(b) - s(a,b)$, where
+$s(a,b) = |D_a \cap D_b| \in \{0,1\}$ counts the shared gates.
+\end{quote}
+
+Structurally, take $g$ to be the output gate of the six-gate optimum for $\oplus_3$: its children
+$a, b$ share the three-gate parity-2 block (computing $\neg(x_1 \oplus x_2)$ in the Lean witness
+\texttt{c6}; $x_1 \oplus x_2$ up to free output polarity), so $|D_a \cap D_b| = 3$ and, since each
+child has $\opt = 4$, $s = 1 + 4 + 4 - 6 = 3 \notin \{0,1\}$. One child,
+$(x_1 \oplus x_2) \wedge \neg x_3$, has its $\opt = 4$ certified by a DRAT chain (UNSAT at
+$k = 1,2,3$; Appendix~\ref{app:repro}); the other child is NPN-equivalent (input/output polarity),
+hence also $\opt = 4$. Krinkin's own $s \le 1$ derivation is separately unsound: he needs
+$s \le \tree(f) - \opt(f)$, but the \S2 identity gives $\tree(f) \le 1 + \opt(a) + \opt(b)$, i.e.
+$s \ge \tree(f) - \opt(f)$ --- the reverse of the comparison the proof requires. (For parity itself
+$s = \tree - \opt = 3$, an equality, so Krinkin's first inequality happens to hold there; his chain
+then breaks at the \emph{second} step, $\tree - \opt \le 1$, which is Theorem~2.) Krinkin's Table~3
+reports $s = 1$ for the complete $\opt$-6 $n = 3$ bucket, which includes the parity decompositions
+--- consistent with his having imposed the bound, and in conflict with the structural count
+$s = 3$.
+
+\paragraph{Fate of the other results.} Theorem~7 (a classification assuming $\gapop = 1$) loses its
+proof, which depends on Corollary~6; its conditional statement under the standard definition is not
+refuted by $\oplus_3$ (gap~3) and is left unproven. \textbf{The statements of Theorems 3 and 4 stand.} Theorem~3's
+published proof applies Lemma~1 (gate elimination) to the sub-DAG $S$ below the shared gate $g$ and
+writes $|S| \ge k-1$, which fails when $g$ is at input level; a corrected incidence-count proof is
+in Appendix~\ref{app:thm3}.
+
+\paragraph{Diagnostic signature.} In Krinkin's complete $n = 3$ table (Table~1), the two functions
+with $\gapop = 1$ at $\opt = 6$ are parity and its complement --- precisely what the \S2 identity
+(with $\opt$ in the children: $1 + \opt(\text{parity}) + \opt(1) = 7$) reports, while the true
+formula size is 9. The error is visible in the paper's data.
+
+\paragraph{Verification.} The counterexample is formalized in Lean~4.31.0 without Mathlib
+(\texttt{UnitGap.lean}): the witnesses and the DP's structural framework are kernel-checked
+(\texttt{decide}, induction); the finite fact $\mathrm{par3} \notin D_8$ --- hence
+$\tree(\oplus_3) \ge 9$ --- is discharged by \texttt{native\_decide} (compiler-trusted, not kernel).
+We report this precisely rather than as blanket ``kernel-checked'' (see \S\ref{sec:verification}).
+
+\section{The failure is structural: AIG gap census at \texorpdfstring{$n = 4$}{n = 4}}
+\label{sec:census}
+
+We computed $\tree(f)$ for all 65{,}536 functions by a layered dynamic program (independently
+re-implemented as a global Bellman fixed point with explicit polarities --- all 65{,}536 cells
+agree), joined with the complete exact $\opt$ catalog. The distribution of $\gapop$ over the 222 NPN
+classes:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrrrrrr}
+\toprule
+$\gapop$ & 0 & 1 & 2 & 3 & 4 & 5 & 6 \\
+\midrule
+classes & 93 & 57 & 40 & 13 & 14 & 2 & 3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+\textbf{72 of the 222 NPN classes (32.4\% of classes) have $\gapop \ge 2$} (a fraction of classes,
+not of all 65{,}536 functions, whose orbit sizes differ). The maximum gap 6 is attained by three
+\textbf{distinct} NPN classes \texttt{\{0x1668, 0x16e9, 0x6996\}} --- all with $\opt = 9$,
+$\tree = 15$ --- distinguished by their XAG optima ($\optx = 6, 5, 3$ respectively; $\optx$ is
+NPN-invariant, so distinct values force distinct classes). One of the three is parity-4
+(\texttt{0x6996}, $\optx = 3$). For parity-4, Khrapchenko's bound ($\ge 16$ leaves $\implies \ge 15$
+gates) meets $\tree = 15$ with equality. The embedded $n = 3$ functions reproduce the $n = 3$ table
+256/256. Parity is thus \textbf{a} witness of the maximum gap, not its exclusive source: the census
+is consistent with, but does not by itself isolate, ``linear structure without native XOR'' as the
+mechanism for all 72 violating classes.
+
+\section{Base dependence: XAG, MIG, and a directed search at \texorpdfstring{$n = 5$}{n = 5}}
+\label{sec:basedep}
+
+The large parity AIG gaps are consistent with the cost of building parity from AND gates, suggesting a
+basis artifact.
+
+\paragraph{XAG, $n \le 4$ (exhaustive).} With a native XOR gate, the pipeline (encoder validated by
+an independent exhaustive enumeration at $n = 3$ and by a formula-encoder gate on all 222 $n = 4$
+classes) gives $\optx$ maximum 7 (strictly below AIG in 190/222 classes; $\optx(\oplus_4) = 3$) and
+$\treex$ maximum 7. The gap census (\texttt{certs}: \texttt{npn4\_xag\_gap.csv}): $n = 3$ ---
+$\gapx = 0$ for all 256 functions; $n = 4$ --- $\gapx \in \{0,1\}$, distributed $\{0: 218, 1: 4\}$.
+The unit-gap property, false in AIG, \textbf{holds in XAG for $n \le 4$} under this separately gated
+encoder whose UNSAT instances are not proof-certified (\S\ref{sec:verification}).
+
+\paragraph{XAG, $n = 5$ (directed search).} Exhaustive census is infeasible ($2^{32}$ truth tables).
+We searched for a \emph{separator} ($\gapx \ge 2$) by generating candidate functions from random XAG
+circuits with sharing and XOR bias, keeping those essential in all five variables, and deciding
+$\optx$ and $\treex$ exactly by SAT (ascending search, 20\,s cap). This is a
+\textbf{generator-reachable, solver-decided sample}, not a probability statement: functions whose
+$\opt$ timed out or exceeded the cap are not written and thus not counted, so the sample is
+conditional on easy circuit optimization. The formula encoder was gated before the search (matching
+the $n = 4$ DP on all 222 classes, including the four with $\gapop = 1$); an early false positive
+(parity-5) was fixed by ascending from $\opt$ (Appendix~\ref{app:encoders}).
+
+Over \textbf{25{,}373 distinct} essential functions of five variables (deduplicated across workers):
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrr}
+\toprule
+verdict & functions & \% \\
+\midrule
+gap 0 & 24{,}875 & 98.04 \\
+gap 1 & 294 & 1.16 \\
+inconclusive (formula-search timeout) & 204 & 0.80 \\
+\textbf{separator ($\gapx \ge 2$)} & \textbf{0} & \textbf{0} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+\textbf{No separator was certified.} All \textbf{25{,}169 gap-decided} functions have
+$\gapx \in \{0,1\}$; the 204 inconclusive cases are formula-search timeouts and could in principle
+be separators. As an added check, all 294 gap-1 functions and a sample of 200 gap-0 functions were
+re-decoded and simulation-verified (optimal circuit and formula both compute the truth table);
+494/494 passed (Appendix~\ref{app:repro}). This is a \textbf{directed sample, not a proof}: a
+separator of high $\opt$, or outside the generation bias, is not excluded. What the search
+establishes is that no separator appears among 25{,}169 gap-decided, generator-reachable essential
+functions of $n = 5$.
+
+\paragraph{MIG (aggregate cross-check).} Soeken, Amarù, Gaillardon and De Micheli~\cite{soeken2016}
+published the optimal MIG size distribution for the 222 classes of $n = 4$. We re-derived the census
+with a different solver (kissat vs.\ Z3) and encoding and matched the published \textbf{size
+distribution} $\{0{:}2, 1{:}2, 2{:}5, 3{:}18, 4{:}42, 5{:}117, 6{:}35, 7{:}1\}$ \textbf{bucket by
+bucket}, including the unique 7-node class. (Their table publishes bucket counts, not a per-class
+map; equal aggregate distributions cross-check the shared exact-synthesis machinery, not the
+per-class assignments.)
+
+\paragraph{Cross-base summary ($n = 4$).}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccc}
+\toprule
+ & AIG & XAG & MIG \\
+\midrule
+max $\opt$ & 10 & 7 & 7 \\
+$\opt(\oplus_4) / \tree(\oplus_4)$ & 9 / 15 & 3 / 3 & 6 / --- \\
+gap census & up to 6; 32.4\% of classes $\ge 2$ & $\{0,1\}$ & deferred \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+($\treemig$ requires a ternary DP whose naive form is cubic in set sizes; deferred.)
+
+\section{Verification}
+\label{sec:verification}
+
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{@{}p{0.30\textwidth}Y@{}}
+\toprule
+Claim & Level of certification \\
+\midrule
+$\opt(\oplus_3) = 6$ (lower bound) &
+DRAT proofs for UNSAT at \textbf{every $k = 1,\dots,5$}, \texttt{drat-trim} \texttt{s VERIFIED};
+transcript + hashes archived (Appendix~\ref{app:repro}) \\
+\addlinespace
+$\opt$ of the shared child $= 4$; other child NPN-equivalent &
+DRAT proofs for UNSAT at $k = 1,2,3$ on the representative child, \texttt{drat-trim}
+\texttt{s VERIFIED}; the second child is NPN-equivalent \\
+\addlinespace
+$\tree(\oplus_3) = 9$; witnesses &
+Lean 4 kernel (\texttt{decide}) for witnesses + DP structural framework; the finite exclusion
+$\mathrm{par3} \notin D_8$ (hence $\tree \ge 9$) by \texttt{native\_decide} (compiler-trusted); two
+implementations of the same recurrence agree \\
+\addlinespace
+$\gapop(\oplus_3) \ge 2$ &
+Analytic (Khrapchenko + six-gate circuit), independent of the tree DP and the DRAT chain; and
+fully citational via Schnorr + Khrapchenko \\
+\addlinespace
+$\gapop(\oplus_3) = 3$ (exact) &
+Fully citational: Schnorr~\cite{schnorr1976} for $\opt = 6$ and Lee~\cite{lee2007} for
+$\tree = 9$; the only step supplied here is the basis identification of \S\ref{sec:prelim} \\
+\addlinespace
+$\opt(\oplus_3) = 6$, $\opt(\oplus_4) = 9$ (external agreement) &
+Classical: the AIG basis is $U_2$ and Schnorr's theorem gives the $U_2$ complexity of $\oplus_n$ as
+exactly $3n-3$~\cite{schnorr1976} --- an independent check of the encoder at two points \\
+\addlinespace
+AIG gap census $n = 4$ &
+Two implementations of the tree recurrence agree on all 65{,}536 cells; the $\opt$ side is the
+author's companion catalogue~\cite{krinkin-catalog}, re-derived here class by class (222/222) --- its UNSAT
+side is gated but not DRAT-certified (declared) \\
+\addlinespace
+XAG census $n \le 4$ &
+Gated encoder (independent exhaustive enumeration at $n = 3$; formula encoder matches DP on all 222
+$n = 4$ classes); SAT models simulation-verified; UNSAT side not proof-certified (declared) \\
+\addlinespace
+XAG search $n = 5$ &
+Encoder gated at $n \le 4$; 494 instances (all gap1 + a gap0 sample) re-decoded and
+simulation-verified; sample, not exhaustive (declared) \\
+\addlinespace
+MIG census $n = 4$ &
+Same gating + exact match with an independently published size distribution (aggregate) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\noindent
+The two $\tree$ implementations are independent \emph{implementations of the same Bellman recurrence}
+(layered vs.\ fixed-point) --- strong bug detection; the semantic bridge (that the recurrence
+computes formula size) is the Lean completeness lemma. The four-model-family adversarial review is
+provenance, not part of the verification chain.
+
+\section{Related work and novelty}
+
+\begin{itemize}
+  \item \textbf{Krinkin, arXiv:2603.08033}~\cite{krinkin-unitgap} is the refuted paper;
+  \textbf{arXiv:2603.09379}~\cite{krinkin-catalog} (an NPN-4 AIG catalog whose two open entries we
+  closed) is a companion note. Both were communicated to the author, who
+  confirmed the refutation independently; the exact values closing the catalogue's two open
+  entries, and a proof for the unit-gap paper's Theorem~3, were contributed back
+  (\texttt{krinkin/bounds\#2}, \texttt{krinkin/unit-gap\#2}).
+
+  \item \textbf{MIG:} the optimal $n = 4$ sizes were previously published (Soeken et al., DATE
+  2016~\cite{soeken2016}; TCAD 2017~\cite{soeken2017}); our census is replication, claimed only as
+  an aggregate cross-check.
+
+  \item \textbf{XAG total-gate count} is essentially the classical combinational complexity over
+  $B_2$, tabulated for small $n$ by Knuth (TAOCP 7.1.2)~\cite{knuth-taocp4a}; our maximum of 7
+  agrees. We claim \textbf{no novelty for the XAG numbers themselves}.
+
+  \item \textbf{Both sizes of parity are classical.} Schnorr~\cite{schnorr1976} determined the
+  $U_2$ circuit complexity of $\oplus_n$ exactly, $3n-3$, and Lee~\cite{lee2007} determined its
+  De~Morgan formula size exactly. Since the AIG basis with free inversions is
+  $U_2$ (\S\ref{sec:prelim}), the two together fix $\opt(\oplus_3) = 6$ and $\tree(\oplus_3) = 9$
+  --- hence the gap 3 --- without any computation, and they agree with the values reported here at
+  $n = 4$ as well ($\opt = 9$, $\tree = 15$, gap 6, the census maximum). We claim \textbf{no novelty
+  for either size}; they are used as an external check and to make the refutation citational. What
+  we did not find in the literature is the two placed side by side: the circuit bound and the
+  formula bound sit in different corners --- gate-elimination and rank methods respectively --- and
+  reading them together requires only the basis identification above, which is why the
+  contradiction with Theorem~2 could sit unnoticed in published results for two decades.
+
+  \item \textbf{Exhaustive catalogs of small functions} --- exact synthesis over NPN-4 classes
+  (Soeken et al.~\cite{soeken2018}; Haaswijk~\cite{haaswijk-thesis}), SAT-based circuit
+  search~\cite{kojevnikov2009}, and ESOP exact synthesis~\cite{riener2018} --- tabulate optimal
+  \emph{circuits} (or, for ESOP, optimal formulas alone). We did not find a catalog reporting both
+  measures for the same functions. The closest related line is the study of \textbf{fanout-free
+  (read-once) functions}~\cite{hayes1975}, which concerns formulas in which each \emph{variable}
+  occurs once. That is strictly stronger than $\gapop(f) = 0$, which only asks that some optimal
+  circuit have fan-out one at every \emph{gate}, variables being free to reappear as leaves:
+  $x_1 \oplus x_2$ has $\gapop = 0$ in AIG ($\opt = \tree = 3$) and is not read-once. Neither line
+  tabulates the gap.
+
+  \item \textbf{Contributions reported here:} (i) the refutation of Theorem~2 and Corollary~6, with
+  machine-checked certificates and a Lean formalization, and the localization of the error to the
+  paper's own
+  two incompatible characterizations in \S2 and \S3; and (ii) an \emph{explicitly tabulated}
+  gap-by-basis comparison ($\tree - \opt$ per NPN class) in AIG and XAG at $n \le 4$, with a
+  directed $n = 5$ XAG search. The $\tree - \opt$ difference is a subtraction of columns each of
+  which is classical, so (ii) is a contribution of organized data and the base-dependence
+  observation, not of a new measure; it is likely implicit in any catalog publishing both sizes. We
+  searched Knuth's $B_2$ data, the MIG/AIG and NPN-4 exact-synthesis catalogs, the ESOP and
+  read-once/fanout-free literature, and the standard EDA benchmark collections (IWLS, the EPFL
+  combinational suite, LGSynth) without finding the
+  gap-by-basis comparison stated explicitly, but treat (ii) as ``apparently unreported'' pending a
+  specialist check.
+\end{itemize}
+
+\section{Open questions}
+
+\begin{enumerate}
+  \item Does $\gapx$ remain in $\{0,1\}$ for all of $n = 5$ (the directed search found no
+  separator among 25{,}169 gap-decided functions) and for larger $n$? Parity no longer separates in
+  XAG; other separators are not excluded.
+  \item Is there a theorem behind the empirical XAG unit gap at small $n$ --- e.g.\ a normal-form
+  argument bounding sharing once linear structure is factored out?
+  \item An efficient exact DP for $\treemig$ (the deferred MIG gap column).
+  \item A proof, or a counterexample, for the conditional statement of Krinkin's Theorem~7 under
+  the standard definition. What $\oplus_3$ removes is the published proof, which routes through
+  Corollary~6; the statement itself is left open.
+\end{enumerate}
+
+\section*{Acknowledgements}
+I thank Kirill Krinkin. Told that Theorem~2 of~\cite{krinkin-unitgap} was false, he checked the
+counterexample himself --- by Khrapchenko's bound, independently of anything presented here ---
+confirmed it the same day, and said so plainly. He has stated that he will withdraw the preprint.
+His reading of the damage is the one adopted in \S\ref{sec:refutation}, including the distinction
+that is easiest to get wrong: Corollary~6 falls with Theorem~2, and Theorem~7 loses its proof but
+is not itself refuted, while Theorems 3 and 4 stand. He raised no question of priority.
+
+Conceding a refutation quickly and in full is harder than it looks, and rarer than it should be.
+His companion catalogue~\cite{krinkin-catalog} also supplied the $n = 4$ optima that the census
+rests on; its two open entries were closed in the course of this work.
+
+\section*{Methods note}
+The analysis, code and certificates reported here were produced by an AI system operating under
+the direction of the author, who selected the target, set the verification standard and is
+responsible for all claims. Correctness does not rest on that process: the circuit lower bounds
+carrying the refutation --- $\opt(\oplus_3) \ge 6$ and the shared-child bound --- are DRAT proofs
+checked by \texttt{drat-trim} (the census UNSAT sides are gated but not proof-certified, as
+\S\ref{sec:verification} declares), the formula-size counterexample is checked by the
+Lean~4 kernel except where \texttt{native\_decide} is declared, and the analytic fail-safe
+(Khrapchenko) is independent of both. Before the results were communicated externally, the package
+was reviewed adversarially by four independent language-model families; that review is provenance,
+not verification.
+
+\nocite{khrapchenko1971,kojevnikov2009,tools}
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\appendix
+
+\section{Corrected proof of Theorem 3 (Threshold)}
+\label{app:thm3}
+
+\begin{claim}
+If $f$ has $n$ essential variables and $\gapop(f) = 1$, then $\opt(f) = m \ge n$.
+\end{claim}
+
+\begin{proof}
+Since $\gapop(f) = 1$, take a size-optimal single-output AIG $C$ for $f$. $C$ is \textbf{not a
+tree}: if it were, $\tree(f) \le |C| = \opt(f)$, forcing $\gapop(f) = 0$, contrary to hypothesis. So
+some non-output gate of $C$ has fan-out $\ge 2$. Now count input incidences. Every gate has two
+inputs, so the total number of input slots is $2m$; partition them into $I_{\mathrm{var}}$ slots
+reading a primary input or the constant, and $I_{\mathrm{gate}}$ slots reading another gate, so
+$2m = I_{\mathrm{var}} + I_{\mathrm{gate}}$.
+
+\begin{itemize}
+  \item \emph{Essential variables:} each of the $n$ essential variables must feed at least one slot
+  (else $f$ would not depend on it), so $I_{\mathrm{var}} \ge n$.
+  \item \emph{Gate usage:} each of the $m - 1$ non-output gates feeds at least one later slot
+  (normalized circuit: no unused gate), contributing $\ge m - 1$; the fan-out-$\ge 2$ gate
+  contributes at least one further incidence, so $I_{\mathrm{gate}} \ge m$.
+\end{itemize}
+
+Hence $2m = I_{\mathrm{var}} + I_{\mathrm{gate}} \ge n + m$, i.e.\ $m \ge n$.
+\end{proof}
+
+\noindent
+(The bound holds for any non-tree optimal single-output circuit, subsuming the $\gapop = 1$ case.
+The published proof's $|S| \ge k-1$ step applies gate elimination to the cone $S$ \emph{excluding}
+the shared gate $g$; when $g$ is at input level the $k$ essential variables of $S \cup \{g\}$ are
+not all covered by $S$, and the count is short by one. The incidence argument avoids the case
+split.)
+
+\section{Encoders, gates, and the parity-5 false positive}
+\label{app:encoders}
+
+The repository documents the AIG, XAG and multi-output encoders together with the validation
+gates each had to pass before use. For the XAG formula encoder these were: the complete $n = 3$
+check ($\treex = \optx$ on all 256 functions), and \texttt{tree\_via\_sat} matching the independent
+DP on all 222 classes at $n = 4$, including the four with $\gapx = 1$.
+
+\paragraph{The parity-5 false positive.} The first $n = 5$ search implementation tested
+formula-satisfiability at exactly $\opt + 1$ gates in isolation and declared a separator when that
+single instance was UNSAT. This is unsound for a normalized exact-size encoder: UNSAT at exactly
+$\opt + 1$ means ``no formula of \emph{exactly} $\opt + 1$ gates'', not $\tree \ge \opt + 2$ (a
+formula of a different size may exist). The bug surfaced on parity-5 (\texttt{0x69969669}), a linear
+function with $\gapx = 0$, which the isolated test misreported as a separator. The fix searches
+\textbf{ascending from $\opt$} ($\tree$ is the first $k \ge \opt$ with a satisfiable formula
+encoding); parity-5 then correctly returns gap 0. All results in \S\ref{sec:basedep} use the fixed procedure.
+
+\section{Reproducibility}
+\label{app:repro}
+
+\begin{sloppypar}
+Every artifact named below is public at
+\url{https://github.com/totobusnello/unit-gap-certificates}; the repository root carries a
+table mapping this paper's principal claims to the files that back them. Re-checking that the archived
+CNFs are unsatisfiable requires \texttt{drat-trim} alone --- not the encoders, not the solver,
+and nothing else in the repository. What a DRAT proof does \emph{not} certify is that a CNF
+faithfully encodes the question asked of it; that is a separate obligation, discharged here by
+cross-checking the encoder against independent exhaustive enumeration
+(\S\ref{sec:verification}). The recorded transcript carries the SHA-256 of every CNF and DRAT
+file, so a reader can confirm they are checking the same bytes.
+\end{sloppypar}
+
+\begin{sloppypar}
+kissat 4.0.4; \texttt{drat-trim} (marijnheule @ commit \texttt{2e3b2dc}); Lean 4.31.0. Versioned
+artifacts: encoders, gates, censuses (AIG \texttt{npn4\_gap.csv}, XAG \texttt{npn4\_xag\_gap.csv}
+with per-class \texttt{opt\_xag}/\texttt{tree\_xag}/\texttt{gap\_xag}, MIG); CNFs and the
+$k = 1,\dots,5$ DRAT proofs for $\opt(\oplus_3)$ and $k = 1,\dots,3$ for the representative child;
+the \texttt{drat-trim} transcript \texttt{certificates/verify\_lowk.log} (\texttt{s VERIFIED}, exit code,
+and CNF/DRAT SHA-256 for all eight proofs); the $n = 5$ search CSVs (raw per-worker and globally
+deduplicated) and the 494/494 re-verification log; and the Lean sources. The $n = 5$ search seeds
+are deterministic per worker; the bench is a 2-vCPU VPS.
+\end{sloppypar}
+
+\end{document}

@@ -1,0 +1,9 @@
+sweep 1: 48 relaxações [0s]
+sweep 2: 684 relaxações [0s]
+sweep 3: 20818 relaxações [0s]
+sweep 4: 115266 relaxações [6s]
+sweep 5: 1862 relaxações [74s]
+sweep 6: 0 relaxações [148s]
+ponto fixo em 6 sweeps; max tree = 15 [148s]
+v2 (Bellman) == v1 (camadas) em TODAS as 65.536 células ✓
+tree(0x6996) = 15 | [150s total]

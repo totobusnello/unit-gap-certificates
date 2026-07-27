@@ -1,0 +1,5 @@
+opt via kissat: 256 funções em 15s, max opt = 6
+tree (Bellman correto, filhos=árvores): 3 rodadas
+distribuicao de gap (n=3, 256 funcoes): {0: 214, 1: 40, 3: 2}
+paridade_3 (tt=150): opt=6, tree=9, gap=3
+pior gap: tt=0x69: opt=6, tree=9, gap=3
