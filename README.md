@@ -1,4 +1,4 @@
-# unit-gap-certificates: machine-checkable artefacts for a refutation of Theorem 2 of arXiv:2603.08033
+# unit-gap-artefacts: machine-checkable artefacts for a refutation of Theorem 2 of arXiv:2603.08033
 
 Machine-checkable artefacts for a refutation of Theorem 2 of Krinkin, *The Unit Gap: How
 Sharing Works in Boolean Circuits* ([arXiv:2603.08033v2]). The refutation itself rests on a

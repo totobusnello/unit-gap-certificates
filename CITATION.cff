@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use these artefacts, please cite the archived Zenodo record rather than the repository URL."
-title: "unit-gap-certificates: machine-checkable artefacts for a refutation of Theorem 2 of arXiv:2603.08033"
+title: "unit-gap-artefacts: machine-checkable artefacts for a refutation of Theorem 2 of arXiv:2603.08033"
 abstract: >-
   DRAT proof certificates, exhaustive NPN-class gap censuses, exact-synthesis
   encoders, and a Lean 4 formalization supporting a refutation of Theorem 2 of
@@ -17,7 +17,7 @@ authors:
     affiliation: "Curious Tech Entrepreneur, São Paulo, Brazil"
 type: software
 license: MIT
-repository-code: "https://github.com/totobusnello/unit-gap-certificates"
+repository-code: "https://github.com/totobusnello/unit-gap-artefacts"
 keywords:
   - circuit complexity
   - And-Inverter Graph
