@@ -54,9 +54,10 @@ $\opt(\oplus_3) = 6$; Khrapchenko forces $\tree(\oplus_3) \ge 9$ leaves, hence $
 formula with $L$ leaves has $L-1$ gates). \textbf{So $\gapop(\oplus_3) \ge 2 > 1$ follows from
 two published results and the basis identification above, with no computation of ours in the
 chain: Theorem~2 was already contradicted by the literature.} The exact value 3 needs
-$\tree(\oplus_3) = 9$, which is not in the refereed literature; that side is certified here by
-two independent dynamic programs and the Lean development (the circuit side, $\opt = 6$, by the
-DRAT chain), and agrees with an exhaustive enumeration published informally in 2011. At $n = 4$ the exact gap is classical again: Tarui
+$\tree(\oplus_3) = 9$, which is not in the refereed literature. That formula-side value is
+certified here by two independent dynamic programs and the Lean development, and agrees with an
+exhaustive enumeration published informally in 2011; the circuit side, $\opt = 6$, rests on the
+DRAT chain above. At $n = 4$ the exact gap is classical again: Tarui
 determined the De~Morgan formula size of $\oplus_n$ for $n = 2^k$ to be exactly $n^2$ leaves,
 giving $\gapop(\oplus_4) = 15 - 9 = 6$ --- the maximum of the census below. The error is locatable in the
 paper: \S2 displays $\tree(f) = \min(1 + \opt(a) + \opt(b))$ (the DAG measure $\opt$ in the
@@ -508,9 +509,10 @@ provenance, not part of the verification chain.
   citational. What
   we did not find in the literature is the two placed side by side: the circuit bound and the
   formula bound come from different traditions --- gate elimination and Khrapchenko's measure ---
-  and reading them together requires only the basis identification above. Both have been in print
-  since 1976, so the facts that contradict Theorem~2 were already on the record when it was
-  stated; what was missing was a reason to subtract one from the other.
+  and reading them together requires only the basis identification above. Khrapchenko's bound
+  dates from 1971 and Schnorr's from 1976, so the facts that contradict Theorem~2 were on the
+  record for fifty years before it was stated; what was missing was a reason to subtract one
+  from the other.
 
   \item \textbf{Exhaustive catalogs of small functions} --- exact synthesis over NPN-4 classes
   (Soeken et al.~\cite{soeken2018}; Haaswijk~\cite{haaswijk-thesis}), SAT-based circuit
