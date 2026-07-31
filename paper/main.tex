@@ -29,7 +29,7 @@
 A Mechanically Verified Refutation and a Cross-Base Census}
 \author{%
   Luiz Antonio Busnello \\
-  Curious Tech Entrepreneur \\
+  Independent Researcher \\
   S\~{a}o Paulo, Brazil \\
   \texttt{lab@generantis.com.br} \\
 }
@@ -182,7 +182,11 @@ $\tree(f) = \min(1 + \tree(a) + \tree(b))$, a different object from the \S2 iden
 characterizations of formula size the two coincide term-by-term only on children for which
 $\opt = \tree$. Krinkin further states --- as a \emph{consequence of Theorem~2}, not a definition ---
 that $T$'s fixed point ``overshoots $\opt(f)$ by exactly $\gapop(f) \in \{0,1\}$'', which collapses
-together with Theorem~2. For $\oplus_3$ the recursive $T$ computes 9, overshooting $\opt = 6$ by 3;
+together with Theorem~2.\footnote{Krinkin frames the same collapse in the language of dynamic
+programming: once gates are shared, an optimum for the whole does not restrict to optima on its
+parts, so $\opt$ cannot be a fixed point of a Bellman operator over disjoint children --- which
+is equally why the \S2 identity fails. This is the content of his Remark~5. (K.\ Krinkin,
+personal communication, 2026.)} For $\oplus_3$ the recursive $T$ computes 9, overshooting $\opt = 6$ by 3;
 under the \S3 reading, Theorem~2 is false.
 
 \begin{itemize}
@@ -557,7 +561,7 @@ provenance, not part of the verification chain.
 \section*{Acknowledgements}
 I thank Kirill Krinkin. Told that Theorem~2 of~\cite{krinkin-unitgap} was false, he checked the
 counterexample himself --- by Khrapchenko's bound, independently of anything presented here ---
-confirmed it the same day, and said so plainly. He has stated that he will withdraw the preprint.
+confirmed it the same day, and said so plainly. He has withdrawn the preprint (arXiv:2603.08033v3).
 His reading of the damage is the one adopted in \S\ref{sec:refutation}, including the distinction
 that is easiest to get wrong: Corollary~6 falls with Theorem~2, and Theorem~7 loses its proof but
 is not itself refuted, while Theorems 3 and 4 stand. He raised no question of priority.
